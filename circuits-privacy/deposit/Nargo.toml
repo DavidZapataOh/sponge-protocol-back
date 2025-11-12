@@ -1,7 +1,9 @@
 [package]
-name="sp_nft_ownership"
-type="bin"
+name = "sp_nft_deposit"
+type = "bin"
 authors = ["davidzo"]
 compiler_version = ">=0.31.0"
 
 [dependencies]
+
+

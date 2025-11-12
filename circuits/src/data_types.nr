@@ -9,3 +9,30 @@ pub struct RevealedData {
     nullifier: Field,
     nft_metadata_cid_hash: Field,
 }
+
+// Privacy-related data structures for anonymous transfers
+
+pub struct PrivateNote {
+    secret: Field,
+    token_id: Field,
+    view_key: Field,
+}
+
+pub struct StealthAddressData {
+    view_key_public: Field,
+    ephemeral_public: Field,
+}
+
+pub struct DepositOutput {
+    commitment: Field,
+}
+
+pub struct TransferOutput {
+    nullifier: Field,
+    new_commitment: Field,
+}
+
+pub struct WithdrawOutput {
+    nullifier: Field,
+    token_id: Field,
+}
