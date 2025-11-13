@@ -24,55 +24,17 @@ for circuit in "${CIRCUITS[@]}"; do
     echo "Compiling circuit..."
     nargo compile
     
-    # Generate Solidity verifier
-    echo "Generating Solidity verifier..."
-    nargo codegen-verifier
+    # Note: Verifier generation (codegen-verifier) is not available in this version of nargo
+    # Verifiers need to be generated using the backend tool (bb) separately
     
-    # Copy verifier to src/verifier directory
-    if [ -f "contract/$circuit/plonk_vk.sol" ]; then
-        echo "Copying verifier to src/verifier..."
-        mkdir -p "../../src/verifier/privacy"
-        
-        # Create wrapper verifier contract
-        cat > "../../src/verifier/privacy/${circuit^}Verifier.sol" << EOF
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.28;
-
-import { UltraVerifier as ${circuit^}UltraVerifier } from "./${circuit}_plonk_vk.sol";
-
-/**
- * @title ${circuit^}Verifier
- * @notice Verifier for $circuit privacy circuit
- */
-contract ${circuit^}Verifier {
-    ${circuit^}UltraVerifier public verifier;
-
-    constructor() {
-        verifier = new ${circuit^}UltraVerifier();
-    }
-
-    function verify(bytes calldata proof, bytes32[] calldata publicInputs) public view returns (bool) {
-        return verifier.verify(proof, publicInputs);
-    }
-}
-EOF
-        
-        # Copy the actual verifier
-        cp "contract/$circuit/plonk_vk.sol" "../../src/verifier/privacy/${circuit}_plonk_vk.sol"
-        
-        echo -e "${GREEN}✓ $circuit circuit built successfully${NC}"
-    else
-        echo "Warning: Verifier not found for $circuit"
-    fi
+    echo -e "${GREEN}✓ $circuit circuit compiled successfully${NC}"
     
     cd ..
 done
 
-echo -e "${GREEN}All circuits built successfully!${NC}"
+echo -e "${GREEN}All circuits compiled successfully!${NC}"
 echo ""
-echo "Verifier contracts generated in: src/verifier/privacy/"
-echo "- DepositVerifier.sol"
-echo "- TransferVerifier.sol"
-echo "- WithdrawVerifier.sol"
+echo "Circuit artifacts generated in target/ directories"
+echo "Note: To generate Solidity verifiers, use the backend tool (bb) separately"
 
 

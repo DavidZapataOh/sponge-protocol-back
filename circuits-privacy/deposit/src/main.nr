@@ -1,7 +1,7 @@
 // Deposit Circuit: Shield an NFT by creating a commitment
 // This circuit proves that the user knows the secret and recipient public key for a commitment
 
-use std::hash::poseidon2;
+use std::hash::pedersen_hash;
 
 /**
  * @notice Deposit circuit for shielding NFTs
@@ -35,12 +35,9 @@ fn main(
     assert(token_id == token_id_public, "Token ID mismatch");
     
     // Constraint 2: Compute the commitment WITH recipient_pub_key
-    // SECURITY FIX: commitment = Poseidon(secret, token_id, recipient_pub_key)
+    // SECURITY FIX: commitment = Pedersen(secret, token_id, recipient_pub_key)
     let commitment_inputs: [Field; 3] = [secret, token_id, recipient_pub_key];
-    let computed_commitment = poseidon2::Poseidon2::hash(
-        commitment_inputs,
-        commitment_inputs.len()
-    );
+    let computed_commitment = pedersen_hash(commitment_inputs);
     
     // Constraint 3: Verify the commitment matches the public input
     // This ensures the commitment is properly bound to the recipient
