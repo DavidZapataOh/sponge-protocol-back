@@ -13,7 +13,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Circuit directories
-CIRCUITS=("deposit" "transfer" "withdraw")
+CIRCUITS=("deposit" "transfer" "withdraw" "ownership")
 
 for circuit in "${CIRCUITS[@]}"; do
     echo -e "${BLUE}Building $circuit circuit...${NC}"

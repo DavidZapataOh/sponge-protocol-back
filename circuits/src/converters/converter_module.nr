@@ -1,5 +1,5 @@
 //mod test_inputs; // test_inputs.nr
-use std::hash::poseidon2;
+use poseidon::poseidon2::Poseidon2;
 
 
 /** 
@@ -16,7 +16,7 @@ pub fn convert_nft_metadata_cid_to_poseidon_hash(metadata_cid: str<46>) -> Field
     println(metadata_cid_field);
 
     let inputs_for_metadata_cid_field: [Field; 1] = [metadata_cid_field];
-    let metadata_cid_hash = poseidon2::Poseidon2::hash(inputs_for_metadata_cid_field, inputs_for_metadata_cid_field.len());
+    let metadata_cid_hash = Poseidon2::hash(inputs_for_metadata_cid_field, inputs_for_metadata_cid_field.len());
     println(metadata_cid_hash);
 
     metadata_cid_hash

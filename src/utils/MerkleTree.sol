@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
+import { Poseidon2 } from "./Poseidon2.sol";
+import { Field } from "./Field.sol";
 
 /**
  * @title MerkleTree
@@ -148,14 +150,16 @@ library MerkleTree {
 
     /**
      * @notice Hash two child nodes
-     * @dev Uses keccak256 for efficiency. In production, consider Poseidon for ZK-friendliness
+     * @dev Uses Poseidon2 so on-chain hashing matches the Noir circuits
      * @param left The left child hash
      * @param right The right child hash
      * @return The parent hash
      */
     function hashLeftRight(bytes32 left, bytes32 right) internal pure returns (bytes32) {
-        // Ensure consistent ordering to prevent second preimage attacks
-        return keccak256(abi.encodePacked(left, right));
+        Field.Type leftField = Field.toFieldReduce(left);
+        Field.Type rightField = Field.toFieldReduce(right);
+        Field.Type hashed = Poseidon2.hash_2(leftField, rightField);
+        return Field.toBytes32(hashed);
     }
 
     /**

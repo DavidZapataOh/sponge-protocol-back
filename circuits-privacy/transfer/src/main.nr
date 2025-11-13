@@ -1,7 +1,7 @@
 // Transfer Circuit: Anonymously transfer an NFT commitment to a new owner
 // This circuit proves ownership of a commitment and creates a new one for the recipient
 
-use std::hash::pedersen_hash;
+use poseidon::poseidon2::Poseidon2;
 
 /**
  * @notice Transfer circuit for anonymous NFT transfers
@@ -49,7 +49,7 @@ fn main(
     // Step 1: Compute the old commitment WITH sender's public key
     // SECURITY FIX: commitment = Hash(secret, token_id, pub_key)
     let old_commitment_inputs: [Field; 3] = [old_secret, token_id, old_pub_key];
-    let old_commitment = pedersen_hash(old_commitment_inputs);
+    let old_commitment = Poseidon2::hash(old_commitment_inputs, old_commitment_inputs.len());
     
     // Step 2: Verify the old commitment exists in the Merkle tree
     let computed_root = compute_merkle_root(old_commitment, merkle_proof, leaf_index);
@@ -59,14 +59,14 @@ fn main(
     // SECURITY FIX: nullifier = Hash(old_secret, token_id, old_pub_key, "nullify")
     let nullifier_constant = 1; // Constant to differentiate nullifier from commitment
     let nullifier_inputs: [Field; 4] = [old_secret, token_id, old_pub_key, nullifier_constant];
-    let computed_nullifier = pedersen_hash(nullifier_inputs);
+    let computed_nullifier = Poseidon2::hash(nullifier_inputs, nullifier_inputs.len());
     assert(computed_nullifier == nullifier, "Invalid nullifier");
     
     // Step 4: Compute and verify the new commitment for the recipient
     // SECURITY CRITICAL: This BINDS the new commitment to the recipient's public key
     // Prevents relayers or attackers from re-routing the NFT to themselves
     let new_commitment_inputs: [Field; 3] = [new_secret, token_id, new_pub_key];
-    let computed_new_commitment = pedersen_hash(new_commitment_inputs);
+    let computed_new_commitment = Poseidon2::hash(new_commitment_inputs, new_commitment_inputs.len());
     assert(computed_new_commitment == new_commitment, "Invalid new commitment");
     
     // SECURITY: The proof now enforces that:
@@ -106,7 +106,7 @@ fn compute_merkle_root(
             [sibling, current_hash]
         };
         
-        current_hash = pedersen_hash(hash_inputs);
+        current_hash = Poseidon2::hash(hash_inputs, hash_inputs.len());
         
         // Move to parent node
         current_index = (index_as_u32 / 2) as Field;

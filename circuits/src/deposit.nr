@@ -1,7 +1,7 @@
 // Deposit Circuit: Shield an NFT by creating a commitment
 // This circuit proves that the user knows the secret and recipient public key for a commitment
 
-use std::hash::poseidon2;
+use poseidon::poseidon2::Poseidon2;
 
 /**
  * @notice Deposit circuit for shielding NFTs
@@ -37,7 +37,7 @@ fn main(
     // Constraint 2: Compute the commitment WITH recipient_pub_key
     // SECURITY FIX: commitment = Poseidon(secret, token_id, recipient_pub_key)
     let commitment_inputs: [Field; 3] = [secret, token_id, recipient_pub_key];
-    let computed_commitment = poseidon2::Poseidon2::hash(
+    let computed_commitment = Poseidon2::hash(
         commitment_inputs,
         commitment_inputs.len()
     );
@@ -55,7 +55,7 @@ fn test_deposit_valid() {
     
     // Compute expected commitment
     let commitment_inputs: [Field; 3] = [secret, token_id, view_key];
-    let commitment = poseidon2::Poseidon2::hash(
+    let commitment = Poseidon2::hash(
         commitment_inputs,
         commitment_inputs.len()
     );
@@ -84,7 +84,7 @@ fn test_deposit_token_id_mismatch() {
     let view_key = 67890;
     
     let commitment_inputs: [Field; 3] = [secret, token_id, view_key];
-    let commitment = poseidon2::Poseidon2::hash(
+    let commitment = Poseidon2::hash(
         commitment_inputs,
         commitment_inputs.len()
     );

@@ -118,7 +118,7 @@ contract SPNFT is ERC721URIStorage, Ownable, MetaTransactions {
         publicInputs[0] = merkleRoot;
         publicInputs[1] = nullifierHash;
         publicInputs[2] = metadataCidHash; // [NOTE]: The tokenId is used as a public input to verify the proof.
-        bool isValidProof = spNFTOwnershipVerifier.verifySPNFTOwnershipProof(proof, publicInputs);
+        bool isValidProof = spNFTOwnershipVerifier.verify(proof, publicInputs);
         require(isValidProof, "Invalid proof");
         //require(spNFTOwnershipVerifier.verifySPNFTOwnershipProof(proof, publicInputs), "Invalid proof");  
         // console.logBool(isValidProof); // [Log]: true
@@ -143,7 +143,7 @@ contract SPNFT is ERC721URIStorage, Ownable, MetaTransactions {
         bytes32[] memory publicInputs = new bytes32[](2);
         publicInputs[0] = merkleRoot;
         publicInputs[1] = nullifierHash;
-        return spNFTOwnershipVerifier.verifySPNFTOwnershipProof(proof, publicInputs); // If "False", this proof is invalid
+        return spNFTOwnershipVerifier.verify(proof, publicInputs); // If "False", this proof is invalid
     }
 
     // ============================================

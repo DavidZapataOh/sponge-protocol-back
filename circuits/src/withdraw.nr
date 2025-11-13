@@ -1,7 +1,7 @@
 // Withdraw Circuit: Unshield an NFT from the privacy pool
 // This circuit proves ownership of a commitment and allows withdrawal to a public address
 
-use std::hash::poseidon2;
+use poseidon::poseidon2::Poseidon2;
 
 /**
  * @notice Withdraw circuit for unshielding NFTs
@@ -45,7 +45,7 @@ fn main(
     // Step 2: Compute the commitment WITH owner's public key
     // SECURITY FIX: commitment = Hash(secret, token_id, owner_pub_key)
     let commitment_inputs: [Field; 3] = [secret, token_id, owner_pub_key];
-    let commitment = poseidon2::Poseidon2::hash(
+    let commitment = Poseidon2::hash(
         commitment_inputs,
         commitment_inputs.len()
     );
@@ -58,7 +58,7 @@ fn main(
     // SECURITY FIX: nullifier = Hash(secret, token_id, owner_pub_key, "nullify")
     let nullifier_constant = 1; // Same constant as in transfer circuit
     let nullifier_inputs: [Field; 4] = [secret, token_id, owner_pub_key, nullifier_constant];
-    let computed_nullifier = poseidon2::Poseidon2::hash(
+    let computed_nullifier = Poseidon2::hash(
         nullifier_inputs,
         nullifier_inputs.len()
     );
@@ -98,7 +98,7 @@ fn compute_merkle_root(
             [sibling, current_hash]
         };
         
-        current_hash = poseidon2::Poseidon2::hash(hash_inputs, 2);
+        current_hash = Poseidon2::hash(hash_inputs, hash_inputs.len());
         
         // Move to parent node
         current_index = current_index / 2;
@@ -117,7 +117,7 @@ fn test_withdraw_valid() {
     
     // Compute commitment
     let commitment_inputs: [Field; 3] = [secret, token_id, view_key];
-    let commitment = poseidon2::Poseidon2::hash(
+    let commitment = Poseidon2::hash(
         commitment_inputs,
         commitment_inputs.len()
     );
@@ -132,7 +132,7 @@ fn test_withdraw_valid() {
     // Compute nullifier
     let nullifier_constant = 1;
     let nullifier_inputs: [Field; 4] = [secret, token_id, view_key, nullifier_constant];
-    let nullifier = poseidon2::Poseidon2::hash(
+    let nullifier = Poseidon2::hash(
         nullifier_inputs,
         nullifier_inputs.len()
     );
@@ -159,7 +159,7 @@ fn test_withdraw_invalid_root() {
     let recipient = 0x1234567890abcdef;
     
     let commitment_inputs: [Field; 3] = [secret, token_id, view_key];
-    let commitment = poseidon2::Poseidon2::hash(
+    let commitment = Poseidon2::hash(
         commitment_inputs,
         commitment_inputs.len()
     );
@@ -172,7 +172,7 @@ fn test_withdraw_invalid_root() {
     
     let nullifier_constant = 1;
     let nullifier_inputs: [Field; 4] = [secret, token_id, view_key, nullifier_constant];
-    let nullifier = poseidon2::Poseidon2::hash(
+    let nullifier = Poseidon2::hash(
         nullifier_inputs,
         nullifier_inputs.len()
     );
@@ -199,7 +199,7 @@ fn test_withdraw_token_id_mismatch() {
     let recipient = 0x1234567890abcdef;
     
     let commitment_inputs: [Field; 3] = [secret, token_id, view_key];
-    let commitment = poseidon2::Poseidon2::hash(
+    let commitment = Poseidon2::hash(
         commitment_inputs,
         commitment_inputs.len()
     );
@@ -210,7 +210,7 @@ fn test_withdraw_token_id_mismatch() {
     
     let nullifier_constant = 1;
     let nullifier_inputs: [Field; 4] = [secret, token_id, view_key, nullifier_constant];
-    let nullifier = poseidon2::Poseidon2::hash(
+    let nullifier = Poseidon2::hash(
         nullifier_inputs,
         nullifier_inputs.len()
     );
@@ -240,7 +240,7 @@ fn test_withdraw_invalid_nullifier() {
     let recipient = 0x1234567890abcdef;
     
     let commitment_inputs: [Field; 3] = [secret, token_id, view_key];
-    let commitment = poseidon2::Poseidon2::hash(
+    let commitment = Poseidon2::hash(
         commitment_inputs,
         commitment_inputs.len()
     );

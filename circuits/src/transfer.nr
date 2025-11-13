@@ -1,7 +1,7 @@
 // Transfer Circuit: Anonymously transfer an NFT commitment to a new owner
 // This circuit proves ownership of a commitment and creates a new one for the recipient
 
-use std::hash::poseidon2;
+use poseidon::poseidon2::Poseidon2;
 
 /**
  * @notice Transfer circuit for anonymous NFT transfers
@@ -49,7 +49,7 @@ fn main(
     // Step 1: Compute the old commitment WITH sender's public key
     // SECURITY FIX: commitment = Hash(secret, token_id, pub_key)
     let old_commitment_inputs: [Field; 3] = [old_secret, token_id, old_pub_key];
-    let old_commitment = poseidon2::Poseidon2::hash(
+    let old_commitment = Poseidon2::hash(
         old_commitment_inputs,
         old_commitment_inputs.len()
     );
@@ -62,7 +62,7 @@ fn main(
     // SECURITY FIX: nullifier = Hash(old_secret, token_id, old_pub_key, "nullify")
     let nullifier_constant = 1; // Constant to differentiate nullifier from commitment
     let nullifier_inputs: [Field; 4] = [old_secret, token_id, old_pub_key, nullifier_constant];
-    let computed_nullifier = poseidon2::Poseidon2::hash(
+    let computed_nullifier = Poseidon2::hash(
         nullifier_inputs,
         nullifier_inputs.len()
     );
@@ -72,7 +72,7 @@ fn main(
     // SECURITY CRITICAL: This BINDS the new commitment to the recipient's public key
     // Prevents relayers or attackers from re-routing the NFT to themselves
     let new_commitment_inputs: [Field; 3] = [new_secret, token_id, new_pub_key];
-    let computed_new_commitment = poseidon2::Poseidon2::hash(
+    let computed_new_commitment = Poseidon2::hash(
         new_commitment_inputs,
         new_commitment_inputs.len()
     );
@@ -114,7 +114,7 @@ fn compute_merkle_root(
             [sibling, current_hash]
         };
         
-        current_hash = poseidon2::Poseidon2::hash(hash_inputs, 2);
+        current_hash = Poseidon2::hash(hash_inputs, 2);
         
         // Move to parent node
         current_index = current_index / 2;
@@ -132,7 +132,7 @@ fn test_transfer_valid() {
     
     // Compute old commitment
     let old_commitment_inputs: [Field; 3] = [old_secret, token_id, old_view_key];
-    let old_commitment = poseidon2::Poseidon2::hash(
+    let old_commitment = Poseidon2::hash(
         old_commitment_inputs,
         old_commitment_inputs.len()
     );
@@ -150,7 +150,7 @@ fn test_transfer_valid() {
     
     // Compute new commitment
     let new_commitment_inputs: [Field; 3] = [new_secret, token_id, new_view_key];
-    let new_commitment = poseidon2::Poseidon2::hash(
+    let new_commitment = Poseidon2::hash(
         new_commitment_inputs,
         new_commitment_inputs.len()
     );
@@ -158,7 +158,7 @@ fn test_transfer_valid() {
     // Compute nullifier
     let nullifier_constant = 1;
     let nullifier_inputs: [Field; 4] = [old_secret, token_id, old_view_key, nullifier_constant];
-    let nullifier = poseidon2::Poseidon2::hash(
+    let nullifier = Poseidon2::hash(
         nullifier_inputs,
         nullifier_inputs.len()
     );
@@ -185,7 +185,7 @@ fn test_transfer_invalid_merkle_proof() {
     let old_view_key = 67890;
     
     let old_commitment_inputs: [Field; 3] = [old_secret, token_id, old_view_key];
-    let old_commitment = poseidon2::Poseidon2::hash(
+    let old_commitment = Poseidon2::hash(
         old_commitment_inputs,
         old_commitment_inputs.len()
     );
@@ -199,14 +199,14 @@ fn test_transfer_invalid_merkle_proof() {
     let new_secret = 54321;
     let new_view_key = 98765;
     let new_commitment_inputs: [Field; 3] = [new_secret, token_id, new_view_key];
-    let new_commitment = poseidon2::Poseidon2::hash(
+    let new_commitment = Poseidon2::hash(
         new_commitment_inputs,
         new_commitment_inputs.len()
     );
     
     let nullifier_constant = 1;
     let nullifier_inputs: [Field; 4] = [old_secret, token_id, old_view_key, nullifier_constant];
-    let nullifier = poseidon2::Poseidon2::hash(
+    let nullifier = Poseidon2::hash(
         nullifier_inputs,
         nullifier_inputs.len()
     );
@@ -233,7 +233,7 @@ fn test_transfer_invalid_nullifier() {
     let old_view_key = 67890;
     
     let old_commitment_inputs: [Field; 3] = [old_secret, token_id, old_view_key];
-    let old_commitment = poseidon2::Poseidon2::hash(
+    let old_commitment = Poseidon2::hash(
         old_commitment_inputs,
         old_commitment_inputs.len()
     );
@@ -245,7 +245,7 @@ fn test_transfer_invalid_nullifier() {
     let new_secret = 54321;
     let new_view_key = 98765;
     let new_commitment_inputs: [Field; 3] = [new_secret, token_id, new_view_key];
-    let new_commitment = poseidon2::Poseidon2::hash(
+    let new_commitment = Poseidon2::hash(
         new_commitment_inputs,
         new_commitment_inputs.len()
     );

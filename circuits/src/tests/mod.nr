@@ -4,7 +4,7 @@ mod tests {
     use crate::main;                   // src/main.nr
     use crate::data_types::{ IPNftData, RevealedData };  // src/data_types.nr
     use crate::converters;             // src/converters.nr -> converters/convert_cid_to_poseidon_hash.nr -> convert_nft_metadata_cid_to_poseidon_hash()
-    use std::hash::poseidon2;
+    use poseidon::poseidon2::Poseidon2;
 
     #[test]
     fn test_nft_metadata_verifier() {
@@ -24,7 +24,7 @@ mod tests {
         let expected_nft_metadata_cid_hash: Field = converters::converter_module::convert_nft_metadata_cid_to_poseidon_hash(nft_metadata_cid);
         println(expected_nft_metadata_cid_hash);
 
-        let expected_nullifier = poseidon2::Poseidon2::hash([root, secret, ip_nft_data.nft_owner, ip_nft_data.nft_token_id, expected_nft_metadata_cid_hash], 5);
+        let expected_nullifier = Poseidon2::hash([root, secret, ip_nft_data.nft_owner, ip_nft_data.nft_token_id, expected_nft_metadata_cid_hash], 5);
         println(expected_nullifier);
 
         //let nullifier = main(
@@ -41,11 +41,11 @@ mod tests {
         println(revealed_data.nft_metadata_cid_hash);
 
         let inputs_for_note_commitment: [Field; 1] = [secret];
-        let note_commitment = poseidon2::Poseidon2::hash(inputs_for_note_commitment, inputs_for_note_commitment.len());
+        let note_commitment = Poseidon2::hash(inputs_for_note_commitment, inputs_for_note_commitment.len());
 
         //let inputs_for_nullifier: [Field; 1] = [ip_nft_data.nft_token_id];
         let inputs_for_nullifier: [Field; 5] = [root, secret, ip_nft_data.nft_owner, ip_nft_data.nft_token_id, revealed_data.nft_metadata_cid_hash];
-        let _nullifier = poseidon2::Poseidon2::hash(inputs_for_nullifier, inputs_for_nullifier.len());
+        let _nullifier = Poseidon2::hash(inputs_for_nullifier, inputs_for_nullifier.len());
         println(_nullifier);
 
         // Constraint check
@@ -75,8 +75,8 @@ mod tests {
 
         let inputs_for_metadata_cid_field_1: [Field; 1] = [metadata_cid_1_field];
         let inputs_for_metadata_cid_field_2: [Field; 1] = [metadata_cid_2_field];
-        let metadata_cid_hash_1 = poseidon2::Poseidon2::hash(inputs_for_metadata_cid_field_1, inputs_for_metadata_cid_field_1.len());
-        let metadata_cid_hash_2 = poseidon2::Poseidon2::hash(inputs_for_metadata_cid_field_2, inputs_for_metadata_cid_field_2.len());
+        let metadata_cid_hash_1 = Poseidon2::hash(inputs_for_metadata_cid_field_1, inputs_for_metadata_cid_field_1.len());
+        let metadata_cid_hash_2 = Poseidon2::hash(inputs_for_metadata_cid_field_2, inputs_for_metadata_cid_field_2.len());
         println(metadata_cid_hash_1);
         println(metadata_cid_hash_2);
     }

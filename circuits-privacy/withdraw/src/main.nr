@@ -1,7 +1,7 @@
 // Withdraw Circuit: Unshield an NFT from the privacy pool
 // This circuit proves ownership of a commitment and allows withdrawal to a public address
 
-use std::hash::pedersen_hash;
+use poseidon::poseidon2::Poseidon2;
 
 /**
  * @notice Withdraw circuit for unshielding NFTs
@@ -45,7 +45,7 @@ fn main(
     // Step 2: Compute the commitment WITH owner's public key
     // SECURITY FIX: commitment = Hash(secret, token_id, owner_pub_key)
     let commitment_inputs: [Field; 3] = [secret, token_id, owner_pub_key];
-    let commitment = pedersen_hash(commitment_inputs);
+    let commitment = Poseidon2::hash(commitment_inputs, commitment_inputs.len());
     
     // Step 3: Verify the commitment exists in the Merkle tree
     let computed_root = compute_merkle_root(commitment, merkle_proof, leaf_index);
@@ -55,7 +55,7 @@ fn main(
     // SECURITY FIX: nullifier = Hash(secret, token_id, owner_pub_key, "nullify")
     let nullifier_constant = 1; // Same constant as in transfer circuit
     let nullifier_inputs: [Field; 4] = [secret, token_id, owner_pub_key, nullifier_constant];
-    let computed_nullifier = pedersen_hash(nullifier_inputs);
+    let computed_nullifier = Poseidon2::hash(nullifier_inputs, nullifier_inputs.len());
     assert(computed_nullifier == nullifier, "Invalid nullifier");
     
     // Step 5: No need to verify recipient - it's a public input
@@ -93,7 +93,7 @@ fn compute_merkle_root(
             [sibling, current_hash]
         };
         
-        current_hash = pedersen_hash(hash_inputs);
+        current_hash = Poseidon2::hash(hash_inputs, hash_inputs.len());
         
         // Move to parent node
         current_index = (index_as_u32 / 2) as Field;
